@@ -1,0 +1,49 @@
+name: Monitor Automóvel - Buscas Diárias
+
+on:
+  schedule:
+    # Busca da manhã - 08:00 (horário de Portugal)
+    - cron: '0 7 * * *'
+    # Busca da tarde - 16:00 (horário de Portugal)
+    - cron: '0 15 * * *'
+  
+  # Permitir execução manual
+  workflow_dispatch:
+
+jobs:
+  buscar-anuncios:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 lxml
+      
+      - name: Executar monitor
+        run: python monitor.py
+      
+      - name: Configurar Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+      
+      - name: Commit alterações
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git add dados/
+            git commit -m "📊 Atualização automática - $(date '+%Y-%m-%d %H:%M:%S')"
+            git push
+          else
+            echo "Sem mudanças para commit"
+          fi
