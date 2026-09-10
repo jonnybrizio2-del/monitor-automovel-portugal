@@ -1,0 +1,59 @@
+{
+  "veiculo": "BMW Série 3",
+  "tipo": "Automóvel",
+  "ultima_atualizacao": "2026-09-10T15:00:00Z",
+  "standvirtual": {
+    "url_base": "https://standvirtual.com/search?q=bmw+serie+3",
+    "total_anuncios": 24,
+    "preco_minimo": 8500,
+    "preco_maximo": 22000,
+    "preco_medio": 14200,
+    "anuncios": [
+      {
+        "id": 1,
+        "titulo": "BMW 320i Série 3 - 2019",
+        "preco": 14500,
+        "url": "https://standvirtual.com/anuncio/bmw-320i-serie3-2019-ID001",
+        "localizacao": "Lisboa",
+        "ano": 2019,
+        "kms": 85000
+      },
+      {
+        "id": 2,
+        "titulo": "BMW 325i Série 3 - 2015",
+        "preco": 11200,
+        "url": "https://standvirtual.com/anuncio/bmw-325i-serie3-2015-ID002",
+        "localizacao": "Braga",
+        "ano": 2015,
+        "kms": 145000
+      }
+    ]
+  },
+  "olx": {
+    "url_base": "https://olx.pt/search?q=bmw+serie+3",
+    "total_anuncios": 18,
+    "preco_minimo": 8000,
+    "preco_maximo": 20000,
+    "preco_medio": 13500,
+    "anuncios": [
+      {
+        "id": 1,
+        "titulo": "BMW 320d Série 3 - 2018",
+        "preco": 13800,
+        "url": "https://olx.pt/anuncio/bmw-320d-serie3-2018-ID001",
+        "localizacao": "Setúbal",
+        "ano": 2018,
+        "kms": 120000
+      },
+      {
+        "id": 2,
+        "titulo": "BMW 316i Série 3 - 2012",
+        "preco": 8500,
+        "url": "https://olx.pt/anuncio/bmw-316i-serie3-2012-ID002",
+        "localizacao": "Funchal",
+        "ano": 2012,
+        "kms": 185000
+      }
+    ]
+  }
+}

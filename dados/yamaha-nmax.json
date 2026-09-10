@@ -1,0 +1,55 @@
+{
+  "veiculo": "Yamaha NMAX",
+  "tipo": "Ciclomotor",
+  "ultima_atualizacao": "2026-09-10T15:00:00Z",
+  "standvirtual": {
+    "url_base": "https://standvirtual.com/search?q=yamaha+nmax",
+    "total_anuncios": 12,
+    "preco_minimo": 2500,
+    "preco_maximo": 3200,
+    "preco_medio": 2850,
+    "anuncios": [
+      {
+        "id": 1,
+        "titulo": "Yamaha NMAX 125cc - 2023",
+        "preco": 2800,
+        "url": "https://standvirtual.com/anuncio/yamaha-nmax-125cc-2023-ID001",
+        "localizacao": "Lisboa",
+        "ano": 2023
+      },
+      {
+        "id": 2,
+        "titulo": "Yamaha NMAX 125cc - 2022",
+        "preco": 2600,
+        "url": "https://standvirtual.com/anuncio/yamaha-nmax-125cc-2022-ID002",
+        "localizacao": "Porto",
+        "ano": 2022
+      }
+    ]
+  },
+  "olx": {
+    "url_base": "https://olx.pt/search?q=yamaha+nmax",
+    "total_anuncios": 8,
+    "preco_minimo": 2400,
+    "preco_maximo": 3000,
+    "preco_medio": 2700,
+    "anuncios": [
+      {
+        "id": 1,
+        "titulo": "Yamaha NMAX - Impecável",
+        "preco": 2750,
+        "url": "https://olx.pt/anuncio/yamaha-nmax-impecavel-ID001",
+        "localizacao": "Covilhã",
+        "ano": 2023
+      },
+      {
+        "id": 2,
+        "titulo": "Yamaha NMAX - Para restauro",
+        "preco": 2400,
+        "url": "https://olx.pt/anuncio/yamaha-nmax-restauro-ID002",
+        "localizacao": "Aveiro",
+        "ano": 2020
+      }
+    ]
+  }
+}
