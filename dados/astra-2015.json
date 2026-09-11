@@ -1,19 +1,19 @@
 {
-  "veiculo": "BMW Série 3",
+  "veiculo": "Astra 2015",
   "data_atualizacao": "2026-09-11T22:36:59.609093",
   "plataformas": [
     {
       "plataforma": "Standvirtual",
       "total_anuncios": 0,
       "anuncios": [],
-      "url_busca": "https://www.standvirtual.com/anuncios/automoveis?searchText=BMW+Serie+3&sort_by=created_at_desc",
+      "url_busca": "https://www.standvirtual.com/anuncios/automoveis?searchText=Opel+Astra+2015&sort_by=created_at_desc",
       "data_busca": "2026-09-11T22:36:59.609093"
     },
     {
       "plataforma": "Facebook Marketplace",
       "total_anuncios": 0,
       "anuncios": [],
-      "url_busca": "https://www.facebook.com/marketplace/pt-PT/search?query=BMW%20S%C3%A9rie%203&sortBy=creation_time_descending",
+      "url_busca": "https://www.facebook.com/marketplace/pt-PT/search?query=Astra%202015&sortBy=creation_time_descending",
       "data_busca": "2026-09-11T22:36:59.609093",
       "nota": "Requer JavaScript"
     }
