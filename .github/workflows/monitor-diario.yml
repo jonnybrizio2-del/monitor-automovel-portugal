@@ -9,7 +9,8 @@ on:
   
   # Permitir execução manual
   workflow_dispatch:
-
+permissions:
+  contents: write
 jobs:
   buscar-anuncios:
     runs-on: ubuntu-latest
