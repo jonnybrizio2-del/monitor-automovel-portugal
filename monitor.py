@@ -14,6 +14,12 @@ from datetime import datetime
 from pathlib import Path
 import time
 import random
+from urllib.parse import urljoin
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Criar diretório de dados se não existir
 DADOS_DIR = Path('dados')
@@ -27,34 +33,69 @@ USER_AGENTS = [
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15'
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
+    'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0'
 ]
 
 class MonitorAutomovel:
     def __init__(self):
         self.session = requests.Session()
-        self.session.headers.update({
+        self.headers = {
             'User-Agent': random.choice(USER_AGENTS),
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'pt-PT,pt;q=0.9,en;q=0.8',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7',
             'Accept-Encoding': 'gzip, deflate, br',
+            'Cache-Control': 'max-age=0',
             'DNT': '1',
             'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
             'Referer': 'https://www.google.com/',
-        })
+        }
+        self.session.headers.update(self.headers)
         self.timestamp = datetime.now().isoformat()
+        self.max_retries = 3
+        self.retry_delay = 2
+    
+    def _get_with_retry(self, url, timeout=15, is_olx=False):
+        """
+        Faz requisição com retry automático e delays maiores para OLX
+        """
+        for attempt in range(self.max_retries):
+            try:
+                # Atualizar User-Agent a cada tentativa
+                self.session.headers['User-Agent'] = random.choice(USER_AGENTS)
+                
+                logger.info(f"Tentativa {attempt + 1}/{self.max_retries} para: {url}")
+                response = self.session.get(url, timeout=timeout, allow_redirects=True)
+                response.raise_for_status()
+                return response
+            except requests.exceptions.RequestException as e:
+                logger.warning(f"Erro na tentativa {attempt + 1}: {e}")
+                if attempt < self.max_retries - 1:
+                    # Delay mais longo para OLX
+                    if is_olx:
+                        wait_time = (self.retry_delay * (attempt + 2)) + random.uniform(3, 8)
+                    else:
+                        wait_time = self.retry_delay * (attempt + 1) + random.uniform(0, 2)
+                    logger.info(f"Aguardando {wait_time:.1f}s antes de tentar novamente...")
+                    time.sleep(wait_time)
+                else:
+                    raise
     
     def buscar_standvirtual(self, modelo):
         """
-        Busca anúncios no Standvirtual
+        Busca anúncios no Standvirtual com seletores CSS atualizados
         """
         print(f"\n🔍 Buscando '{modelo}' no Standvirtual...")
         try:
             # URLs para busca no Standvirtual
             urls_sv = {
                 'Yamaha NMAX': 'https://www.standvirtual.com/anuncios/motos-scooters-ciclomotores?searchText=Yamaha+NMAX&sort_by=created_at_desc',
-                'BMW Série 3': 'https://www.standvirtual.com/anuncios/automoveis?searchText=BMW+Seria+3&sort_by=created_at_desc'
+                'BMW Série 3': 'https://www.standvirtual.com/anuncios/automoveis?searchText=BMW+Serie+3&sort_by=created_at_desc'
             }
             
             url = urls_sv.get(modelo)
@@ -62,44 +103,68 @@ class MonitorAutomovel:
                 print(f"⚠️ Modelo não configurado: {modelo}")
                 return None
             
-            response = self.session.get(url, timeout=15)
-            response.raise_for_status()
+            response = self._get_with_retry(url)
             
             soup = BeautifulSoup(response.content, 'html.parser')
             
-            # Extrair dados do Standvirtual - atualizar seletores
+            # Extrair dados do Standvirtual - seletores CSS atualizados
             anuncios = []
             
-            # Procurar por elementos de anúncio (múltiplos seletores possíveis)
-            items = soup.find_all('div', {'class': 'ooa-1aoh7k3'})
-            if not items:
-                items = soup.find_all('article')
-            if not items:
-                items = soup.find_all('a', {'class': 'link-appearance'})
+            # Procurar por elementos de anúncio (novos seletores)
+            # Standvirtual usa divs com data-testid e classes específicas
+            items = soup.find_all('article', {'class': lambda x: x and 'item' in x})
             
-            for item in items[:20]:  # Limitar a 20 resultados
+            if not items:
+                items = soup.find_all('div', {'data-testid': 'listing-item'})
+            
+            if not items:
+                items = soup.find_all('a', {'class': lambda x: x and 'link' in x})
+            
+            logger.info(f"Encontrados {len(items)} itens na página")
+            
+            for item in items[:30]:  # Limitar a 30 resultados
                 try:
-                    # Tentar diferentes formas de extrair dados
-                    titulo_elem = item.find('h2') or item.find('span', {'class': 'title'})
-                    preco_elem = item.find('p', {'class': 'price'}) or item.find('span', {'class': 'price'})
-                    link_elem = item.find('a') or item
+                    # Tentar extrair link primeiro (geralmente é o container)
+                    link_elem = item.find('a', href=True)
+                    if not link_elem:
+                        link_elem = item if item.name == 'a' else None
                     
-                    titulo = titulo_elem.get_text(strip=True) if titulo_elem else 'N/A'
-                    preco = preco_elem.get_text(strip=True) if preco_elem else 'N/A'
-                    url_anuncio = link_elem.get('href', '#') if link_elem else '#'
+                    if not link_elem:
+                        continue
+                    
+                    # Extrair título
+                    titulo_elem = item.find('h2') or item.find('h3') or item.find('span', {'class': lambda x: x and 'title' in x})
+                    titulo = titulo_elem.get_text(strip=True) if titulo_elem else None
+                    
+                    # Se não achou com seletores, tentar text direto
+                    if not titulo:
+                        titulo = link_elem.get_text(strip=True)[:100]
+                    
+                    # Extrair preço
+                    preco_elem = item.find('span', {'class': lambda x: x and 'price' in x}) or \
+                                 item.find('p', {'class': lambda x: x and 'price' in x}) or \
+                                 item.find('strong')
+                    preco = preco_elem.get_text(strip=True) if preco_elem else 'Sob consulta'
+                    
+                    # Extrair URL
+                    url_anuncio = link_elem.get('href', '#')
                     
                     # Garantir que a URL é absoluta
                     if url_anuncio.startswith('/'):
                         url_anuncio = f"https://www.standvirtual.com{url_anuncio}"
+                    elif not url_anuncio.startswith('http'):
+                        url_anuncio = urljoin('https://www.standvirtual.com', url_anuncio)
                     
-                    if titulo and titulo != 'N/A' and url_anuncio != '#':
+                    # Validar dados
+                    if titulo and len(titulo) > 5 and url_anuncio.startswith('http'):
                         anuncios.append({
                             'titulo': titulo,
                             'preco': preco,
                             'url': url_anuncio
                         })
+                        logger.info(f"✓ Adicionado: {titulo[:50]}... | {preco}")
                 except Exception as e:
-                    print(f"Erro ao processar item: {e}")
+                    logger.debug(f"Erro ao processar item: {e}")
                     continue
             
             print(f"✅ {len(anuncios)} anúncios encontrados no Standvirtual")
@@ -113,11 +178,12 @@ class MonitorAutomovel:
             }
         except Exception as e:
             print(f"❌ Erro ao buscar Standvirtual: {e}")
+            logger.exception("Stack trace:")
             return None
     
     def buscar_olx(self, modelo):
         """
-        Busca anúncios no OLX Portugal
+        Busca anúncios no OLX Portugal com delays aumentados para evitar bloqueio
         """
         print(f"🔍 Buscando '{modelo}' no OLX...")
         try:
@@ -132,54 +198,93 @@ class MonitorAutomovel:
                 print(f"⚠️ Modelo não configurado: {modelo}")
                 return None
             
-            # Adicionar delay para evitar bloqueio
-            time.sleep(random.uniform(1, 3))
+            # ⏸️ DELAY IMPORTANTE: OLX é mais agressivo com bloqueios
+            # Usando delay entre 8-15 segundos para parecer mais humano
+            delay = random.uniform(8, 15)
+            logger.info(f"⏸️  Aguardando {delay:.1f}s antes de acessar OLX (anti-bot)...")
+            print(f"⏸️  Aguardando {delay:.1f}s antes de acessar OLX...")
+            time.sleep(delay)
             
-            response = self.session.get(url, timeout=15, allow_redirects=True)
-            response.raise_for_status()
+            # Headers específicos para OLX
+            headers_olx = self.headers.copy()
+            headers_olx['Referer'] = 'https://www.olx.pt/'
+            # Adicionar mais headers realistas
+            headers_olx['Origin'] = 'https://www.olx.pt'
+            headers_olx['Pragma'] = 'no-cache'
+            self.session.headers.update(headers_olx)
+            
+            response = self._get_with_retry(url, timeout=20, is_olx=True)
             
             soup = BeautifulSoup(response.content, 'html.parser')
             
-            # Extrair dados do OLX
+            # Extrair dados do OLX - seletores CSS para OLX atual
             anuncios = []
             
-            # Procurar por elementos de anúncio (múltiplos seletores possíveis)
-            items = soup.find_all('div', {'class': 'OLXad-list-item'})
-            if not items:
-                items = soup.find_all('li', {'class': 'ad'})
-            if not items:
-                items = soup.find_all('div', {'class': 'listing-item'})
+            # Procurar por elementos de anúncio - OLX usa divs específicas
+            items = soup.find_all('div', {'data-cy': 'listing-item'})
             
-            for item in items[:20]:  # Limitar a 20 resultados
+            if not items:
+                items = soup.find_all('a', {'class': lambda x: x and 'listing' in x})
+            
+            if not items:
+                items = soup.find_all('div', {'class': lambda x: x and 'OLXad' in x})
+            
+            if not items:
+                # Última tentativa - procurar por links de anúncios
+                items = soup.find_all('a', {'href': lambda x: x and '/anuncio/' in x})
+            
+            logger.info(f"Encontrados {len(items)} itens na página OLX")
+            
+            for item in items[:30]:  # Limitar a 30 resultados
                 try:
-                    # Tentar diferentes formas de extrair dados
-                    link_elem = item.find('a')
-                    titulo = None
+                    # Para OLX, geralmente o item é um link ou container de link
+                    if item.name == 'a':
+                        link_elem = item
+                    else:
+                        link_elem = item.find('a', href=True)
                     
-                    # Tentar diferentes seletores para título
-                    titulo_elem = item.find('h2') or item.find('span', {'class': 'title'})
+                    if not link_elem:
+                        continue
+                    
+                    # Extrair título
+                    titulo_elem = item.find('h2') or item.find('h3') or item.find('span', {'class': lambda x: x and 'title' in x})
                     if titulo_elem:
                         titulo = titulo_elem.get_text(strip=True)
-                    elif link_elem and link_elem.get_text():
-                        titulo = link_elem.get_text(strip=True)
+                    else:
+                        # Pegar do atributo title ou alt
+                        titulo = link_elem.get('title') or link_elem.get('alt')
                     
-                    preco_elem = item.find('span', {'class': 'price'}) or item.find('p', {'class': 'price'})
-                    preco = preco_elem.get_text(strip=True) if preco_elem else 'N/A'
+                    if not titulo:
+                        titulo = link_elem.get_text(strip=True)[:100]
                     
-                    url_anuncio = link_elem.get('href', '#') if link_elem else '#'
+                    # Extrair preço
+                    preco_elem = item.find('span', {'class': lambda x: x and 'price' in x}) or \
+                                 item.find('div', {'class': lambda x: x and 'price' in x}) or \
+                                 item.find('strong')
+                    preco = preco_elem.get_text(strip=True) if preco_elem else 'Sob consulta'
+                    
+                    # Extrair URL
+                    url_anuncio = link_elem.get('href', '#')
                     
                     # Garantir que a URL é absoluta
                     if url_anuncio.startswith('/'):
                         url_anuncio = f"https://www.olx.pt{url_anuncio}"
+                    elif not url_anuncio.startswith('http'):
+                        url_anuncio = urljoin('https://www.olx.pt', url_anuncio)
                     
-                    if titulo and url_anuncio != '#':
+                    # Validar dados
+                    if titulo and len(titulo) > 5 and url_anuncio.startswith('http'):
                         anuncios.append({
                             'titulo': titulo,
                             'preco': preco,
                             'url': url_anuncio
                         })
+                        logger.info(f"✓ Adicionado: {titulo[:50]}... | {preco}")
+                        
+                        # ⏸️ DELAY entre itens: aguardar um pouco entre cada item para não parecer bot
+                        time.sleep(random.uniform(0.5, 1.5))
                 except Exception as e:
-                    print(f"Erro ao processar item: {e}")
+                    logger.debug(f"Erro ao processar item OLX: {e}")
                     continue
             
             print(f"✅ {len(anuncios)} anúncios encontrados no OLX")
@@ -193,6 +298,7 @@ class MonitorAutomovel:
             }
         except Exception as e:
             print(f"❌ Erro ao buscar OLX: {e}")
+            logger.exception("Stack trace:")
             return None
     
     def monitorar_veiculo(self, modelo, nome_arquivo):
@@ -214,7 +320,8 @@ class MonitorAutomovel:
         if sv:
             dados['plataformas'].append(sv)
         
-        time.sleep(2)  # Aguardar entre requisições
+        # Delay entre plataformas
+        time.sleep(random.uniform(3, 6))
         
         olx = self.buscar_olx(modelo)
         if olx:
@@ -247,7 +354,8 @@ class MonitorAutomovel:
         # Monitorar Yamaha NMAX
         self.monitorar_veiculo('Yamaha NMAX', 'yamaha-nmax.json')
         
-        time.sleep(3)  # Aguardar entre veículos
+        # Delay maior entre veículos
+        time.sleep(random.uniform(6, 10))
         
         # Monitorar BMW Série 3
         self.monitorar_veiculo('BMW Série 3', 'bmw-serie3.json')
