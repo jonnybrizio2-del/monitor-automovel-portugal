@@ -1,20 +1,20 @@
 {
   "veiculo": "Astra 2015",
-  "data_atualizacao": "2026-10-11T15:06:07.466229",
+  "data_atualizacao": "2026-10-12T16:31:25.328754",
   "plataformas": [
     {
       "plataforma": "Standvirtual",
       "total_anuncios": 0,
       "anuncios": [],
       "url_busca": "https://www.standvirtual.com/anuncios/automoveis?searchText=Opel+Astra+2015&sort_by=created_at_desc",
-      "data_busca": "2026-10-11T15:06:07.466229"
+      "data_busca": "2026-10-12T16:31:25.328754"
     },
     {
       "plataforma": "Facebook Marketplace",
       "total_anuncios": 0,
       "anuncios": [],
       "url_busca": "https://www.facebook.com/marketplace/pt-PT/search?query=Astra%202015&sortBy=creation_time_descending",
-      "data_busca": "2026-10-11T15:06:07.466229",
+      "data_busca": "2026-10-12T16:31:25.328754",
       "nota": "Requer JavaScript"
     }
   ]
