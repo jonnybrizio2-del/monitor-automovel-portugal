@@ -1,20 +1,20 @@
 {
   "veiculo": "BMW Série 3",
-  "data_atualizacao": "2026-10-17T11:24:31.136125",
+  "data_atualizacao": "2026-10-17T17:41:53.948204",
   "plataformas": [
     {
       "plataforma": "Standvirtual",
       "total_anuncios": 0,
       "anuncios": [],
       "url_busca": "https://www.standvirtual.com/anuncios/automoveis?searchText=BMW+Serie+3&sort_by=created_at_desc",
-      "data_busca": "2026-10-17T11:24:31.136125"
+      "data_busca": "2026-10-17T17:41:53.948204"
     },
     {
       "plataforma": "Facebook Marketplace",
       "total_anuncios": 0,
       "anuncios": [],
       "url_busca": "https://www.facebook.com/marketplace/pt-PT/search?query=BMW%20S%C3%A9rie%203&sortBy=creation_time_descending",
-      "data_busca": "2026-10-17T11:24:31.136125",
+      "data_busca": "2026-10-17T17:41:53.948204",
       "nota": "Requer JavaScript"
     }
   ]
