@@ -1,20 +1,20 @@
 {
   "veiculo": "Toyota Corolla",
-  "data_atualizacao": "2026-10-17T17:41:53.948204",
+  "data_atualizacao": "2026-10-18T11:57:11.343745",
   "plataformas": [
     {
       "plataforma": "Standvirtual",
       "total_anuncios": 0,
       "anuncios": [],
       "url_busca": "https://www.standvirtual.com/anuncios/automoveis?searchText=Toyota+Corolla&sort_by=created_at_desc",
-      "data_busca": "2026-10-17T17:41:53.948204"
+      "data_busca": "2026-10-18T11:57:11.343745"
     },
     {
       "plataforma": "Facebook Marketplace",
       "total_anuncios": 0,
       "anuncios": [],
       "url_busca": "https://www.facebook.com/marketplace/pt-PT/search?query=Toyota%20Corolla&sortBy=creation_time_descending",
-      "data_busca": "2026-10-17T17:41:53.948204",
+      "data_busca": "2026-10-18T11:57:11.343745",
       "nota": "Requer JavaScript"
     }
   ]
