@@ -1,0 +1,28 @@
+{
+  "veiculo": "Toyota Corolla",
+  "data_atualizacao": "2026-11-19T16:20:31.844942",
+  "plataformas": [
+    {
+      "plataforma": "Standvirtual",
+      "total_anuncios": 0,
+      "anuncios": [],
+      "url_busca": "https://www.standvirtual.com/anuncios/automoveis?searchText=Toyota+Corolla&sort_by=created_at_desc",
+      "data_busca": "2026-11-19T16:20:31.844942"
+    },
+    {
+      "plataforma": "OLX Portugal",
+      "total_anuncios": 0,
+      "anuncios": [],
+      "url_busca": "https://www.olx.pt/search/q-toyota-corolla/",
+      "data_busca": "2026-11-19T16:20:31.844942"
+    },
+    {
+      "plataforma": "Facebook Marketplace",
+      "total_anuncios": 0,
+      "anuncios": [],
+      "url_busca": "https://www.facebook.com/marketplace/pt-PT/search?query=Toyota%20Corolla&sortBy=creation_time_descending",
+      "data_busca": "2026-11-19T16:20:31.844942",
+      "nota": "Requer JavaScript"
+    }
+  ]
+}
