@@ -1,0 +1,28 @@
+{
+  "veiculo": "Yamaha NMAX",
+  "data_atualizacao": "2026-11-24T18:40:13.059786",
+  "plataformas": [
+    {
+      "plataforma": "Standvirtual",
+      "total_anuncios": 0,
+      "anuncios": [],
+      "url_busca": "https://www.standvirtual.com/anuncios/motos-scooters-ciclomotores?searchText=Yamaha+NMAX&sort_by=created_at_desc",
+      "data_busca": "2026-11-24T18:40:13.059786"
+    },
+    {
+      "plataforma": "OLX Portugal",
+      "total_anuncios": 0,
+      "anuncios": [],
+      "url_busca": "https://www.olx.pt/search/q-yamaha-nmax/",
+      "data_busca": "2026-11-24T18:40:13.059786"
+    },
+    {
+      "plataforma": "Facebook Marketplace",
+      "total_anuncios": 0,
+      "anuncios": [],
+      "url_busca": "https://www.facebook.com/marketplace/pt-PT/search?query=Yamaha%20NMAX&sortBy=creation_time_descending",
+      "data_busca": "2026-11-24T18:40:13.059786",
+      "nota": "Requer JavaScript"
+    }
+  ]
+}
